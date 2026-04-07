@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>무료 상담 신청 — TechCo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --cream:      #e8e6dc;
+      --cream-light:#f5f4ed;
+      --ink:        #141413;
+      --ink-mid:    #30302e;
+      --ink-soft:   #87867f;
+      --ink-faint:  #c2c0b6;
+      --rust:       #d97757;
+      --white:      #ffffff;
+      --radius:     4px;
+      --serif:      'Playfair Display', Georgia, serif;
+      --sans:       'Inter', system-ui, sans-serif;
+      --transition: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── 네비게이션 ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 4.25rem;
+      background: rgba(232, 230, 220, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(20, 20, 19, 0.1);
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+    }
+    .nav-inner {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    .nav-back::before { content: '←'; }
+    .nav-back:hover { color: var(--ink); }
+
+    /* ── 페이지 레이아웃 ── */
+    .page {
+      min-height: 100vh;
+      padding-top: 4.25rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── 왼쪽 패널 ── */
+    .left-panel {
+      background: var(--ink);
+      padding: clamp(3rem, 8vw, 6rem) clamp(2rem, 5vw, 4rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: calc(100vh - 4.25rem);
+      position: sticky;
+      top: 4.25rem;
+      height: calc(100vh - 4.25rem);
+    }
+    .left-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 1.5rem;
+    }
+    .left-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px; height: 1px;
+      background: var(--rust);
+    }
+    .left-panel h1 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 500;
+      color: var(--cream);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+    .left-panel h1 em {
+      font-style: italic;
+      color: var(--rust);
+    }
+    .left-panel p {
+      font-size: 0.9375rem;
+      color: var(--ink-soft);
+      line-height: 1.85;
+      max-width: 400px;
+      margin-bottom: 3rem;
+    }
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      border-top: 1px solid rgba(194, 192, 182, 0.2);
+      padding-top: 2rem;
+    }
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.875rem;
+    }
+    .info-icon {
+      width: 32px; height: 32px;
+      background: rgba(217, 119, 87, 0.15);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .info-text strong {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 2px;
+    }
+    .info-text span {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+    }
+
+    /* ── 오른쪽 폼 패널 ── */
+    .right-panel {
+      padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .form-header {
+      margin-bottom: 2.5rem;
+    }
+    .form-header h2 {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+    .form-header p {
+      font-size: 0.875rem;
+      color: var(--ink-soft);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-width: 520px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink-mid);
+      letter-spacing: 0.02em;
+    }
+    label .required {
+      color: var(--rust);
+      margin-left: 2px;
+    }
+    input, select, textarea {
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      color: var(--ink);
+      background: var(--cream-light);
+      border: 1px solid var(--ink-faint);
+      border-radius: var(--radius);
+      padding: 0.7rem 0.9rem;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input::placeholder, textarea::placeholder {
+      color: var(--ink-faint);
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--ink-mid);
+      box-shadow: 0 0 0 3px rgba(20, 20, 19, 0.07);
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2387867f' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.7;
+    }
+
+    /* 체크박스 그룹 */
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+    .checkbox-item input[type="checkbox"] {
+      width: 16px; height: 16px;
+      padding: 0;
+      flex-shrink: 0;
+      cursor: pointer;
+      accent-color: var(--ink);
+    }
+    .checkbox-item span {
+      font-size: 0.85rem;
+      color: var(--ink-mid);
+    }
+
+    /* 개인정보 동의 */
+    .privacy {
+      background: var(--cream-light);
+      border: 1px solid var(--ink-faint);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+    .privacy-check {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    .privacy-check input {
+      width: 16px; height: 16px;
+      padding: 0;
+      flex-shrink: 0;
+      accent-color: var(--ink);
+    }
+    .privacy-check span {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink-mid);
+    }
+
+    .submit-btn {
+      background: var(--ink);
+      color: var(--cream);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.9rem 1.5rem;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: opacity var(--transition);
+      letter-spacing: 0.01em;
+      width: 100%;
+      margin-top: 0.25rem;
+    }
+    .submit-btn:hover { opacity: 0.82; }
+    .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── 완료 화면 ── */
+    .success-screen {
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
+      max-width: 520px;
+    }
+    .success-icon {
+      width: 56px; height: 56px;
+      background: rgba(217, 119, 87, 0.12);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .success-screen h2 {
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    .success-screen p {
+      font-size: 0.9375rem;
+      color: var(--ink-soft);
+      line-height: 1.85;
+      margin-bottom: 2rem;
+    }
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--ink);
+      text-decoration: none;
+      border: 1px solid rgba(20, 20, 19, 0.35);
+      padding: 0.7rem 1.3rem;
+      border-radius: var(--radius);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .back-home:hover {
+      background: rgba(20, 20, 19, 0.04);
+      border-color: var(--ink);
+    }
+
+    /* ── 반응형 ── */
+    @media (max-width: 800px) {
+      .page { grid-template-columns: 1fr; }
+      .left-panel {
+        position: static;
+        height: auto;
+        min-height: auto;
+        padding: 3rem clamp(1.5rem, 5vw, 2.5rem);
+      }
+      .left-panel p { max-width: 100%; }
+      .right-panel, .success-screen {
+        padding: 3rem clamp(1.5rem, 5vw, 2.5rem) 4rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .form-row { grid-template-columns: 1fr; }
+      .checkbox-group { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 네비게이션 -->
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="logo">TechCo</a>
+      <a href="index.html" class="nav-back">홈으로 돌아가기</a>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- 왼쪽 패널 -->
+    <div class="left-panel">
+      <div class="left-eyebrow">Free Consultation</div>
+      <h1>첫 상담은<br /><em>언제나</em><br />무료입니다</h1>
+      <p>
+        어떤 규모의 프로젝트도 환영합니다.<br />
+        아이디어 단계부터 함께하겠습니다.
+      </p>
+
+      <div class="info-list">
+        <div class="info-item">
+          <div class="info-icon">⚡</div>
+          <div class="info-text">
+            <strong>24시간 내 응답</strong>
+            <span>접수 후 영업일 기준 24시간 내 연락드립니다</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">🎯</div>
+          <div class="info-text">
+            <strong>맞춤형 제안</strong>
+            <span>프로젝트 규모와 예산에 맞는 솔루션을 제안합니다</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">🔒</div>
+          <div class="info-text">
+            <strong>비밀 보장</strong>
+            <span>상담 내용은 철저히 보호됩니다</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 오른쪽 폼 -->
+    <div class="right-panel" id="formPanel">
+      <div class="form-header">
+        <h2>상담 신청서</h2>
+        <p>아래 정보를 입력해주시면 담당자가 연락드립니다.</p>
+      </div>
+
+      <form id="contactForm" novalidate>
+
+        <div class="form-row">
+          <div class="field">
+            <label>이름 <span class="required">*</span></label>
+            <input type="text" name="name" placeholder="홍길동" required />
+          </div>
+          <div class="field">
+            <label>회사명</label>
+            <input type="text" name="company" placeholder="(주)테크코" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>이메일 <span class="required">*</span></label>
+            <input type="email" name="email" placeholder="hello@company.com" required />
+          </div>
+          <div class="field">
+            <label>연락처 <span class="required">*</span></label>
+            <input type="tel" name="phone" placeholder="010-0000-0000" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>관심 서비스 <span class="required">*</span></label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="service" value="소프트웨어 개발" />
+              <span>소프트웨어 개발</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="service" value="클라우드 인프라" />
+              <span>클라우드 인프라</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="service" value="보안 & 컴플라이언스" />
+              <span>보안 & 컴플라이언스</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="service" value="데이터 분석" />
+              <span>데이터 분석</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="service" value="AI · 자동화" />
+              <span>AI · 자동화</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="service" value="IT 컨설팅" />
+              <span>IT 컨설팅</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>예산 규모</label>
+          <select name="budget">
+            <option value="" disabled selected>선택해주세요</option>
+            <option>1,000만원 미만</option>
+            <option>1,000 ~ 3,000만원</option>
+            <option>3,000 ~ 5,000만원</option>
+            <option>5,000만원 이상</option>
+            <option>미정 / 협의</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>프로젝트 내용 <span class="required">*</span></label>
+          <textarea name="message" placeholder="어떤 문제를 해결하고 싶으신지 간략히 적어주세요." required></textarea>
+        </div>
+
+        <div class="privacy">
+          수집된 개인정보(이름, 이메일, 연락처)는 상담 목적으로만 사용되며,
+          상담 완료 후 1년간 보관 후 파기됩니다.
+          <div class="privacy-check">
+            <input type="checkbox" id="privacyAgree" required />
+            <span>개인정보 수집 및 이용에 동의합니다 <span class="required">*</span></span>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">상담 신청하기</button>
+
+      </form>
+    </div>
+
+    <!-- 완료 화면 -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✓</div>
+      <h2>신청이<br />완료되었습니다</h2>
+      <p>
+        입력하신 연락처로 영업일 기준<br />
+        24시간 내에 담당자가 연락드리겠습니다.<br /><br />
+        추가 문의: <strong>hello@techco.kr</strong>
+      </p>
+      <a href="index.html" class="back-home">← 홈으로 돌아가기</a>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Supabase 초기화 ──
+    const { createClient } = supabase;
+    const db = createClient(
+      'https://dqkbpdvnxrfsaqjwodyd.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2JwZHZueHJmc2FxandvZHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDU5MTMsImV4cCI6MjA5MTEyMTkxM30.hqyw0J0TdFjUWwOMM9JbQAWUiNqI-IxjckclAft34ws'
+    );
+
+    const form = document.getElementById('contactForm');
+    const formPanel = document.getElementById('formPanel');
+    const successScreen = document.getElementById('successScreen');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // 전화번호 자동 하이픈
+    form.phone.addEventListener('input', (e) => {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 7) v = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7);
+      else if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3);
+      e.target.value = v;
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // 필수 항목 검증
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const phone = form.phone.value.trim();
+      const message = form.message.value.trim();
+      const privacy = document.getElementById('privacyAgree').checked;
+      const services = [...form.querySelectorAll('input[name="service"]:checked')];
+
+      if (!name || !email || !phone || !message || !privacy || services.length === 0) {
+        const missing = [];
+        if (!name) missing.push('이름');
+        if (!email) missing.push('이메일');
+        if (!phone) missing.push('연락처');
+        if (services.length === 0) missing.push('관심 서비스');
+        if (!message) missing.push('프로젝트 내용');
+        if (!privacy) missing.push('개인정보 동의');
+        alert(`다음 항목을 입력/선택해주세요:\n• ${missing.join('\n• ')}`);
+        return;
+      }
+
+      // 이메일 형식 검증
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert('올바른 이메일 주소를 입력해주세요.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '처리 중...';
+
+      // ── Supabase 저장 ──
+      const { error } = await db.from('contacts').insert({
+        name,
+        company: form.company.value.trim() || null,
+        email,
+        phone,
+        services: services.map(el => el.value).join(', '),
+        budget: form.budget.value || null,
+        message,
+      });
+
+      if (error) {
+        alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.\n' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = '상담 신청하기';
+        return;
+      }
+
+      formPanel.style.display = 'none';
+      successScreen.style.display = 'flex';
+    });
+  </script>
+
+</body>
+</html>

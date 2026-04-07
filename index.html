@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechCo — IT 솔루션</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── 리셋 ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ── 토큰 ── */
+    :root {
+      --cream:      #e8e6dc;
+      --cream-light:#f5f4ed;
+      --ink:        #141413;
+      --ink-mid:    #30302e;
+      --ink-soft:   #87867f;
+      --ink-faint:  #c2c0b6;
+      --rust:       #d97757;
+      --gold:       #eda100;
+      --white:      #ffffff;
+      --radius:     4px;
+      --serif:      'Playfair Display', Georgia, serif;
+      --sans:       'Inter', system-ui, sans-serif;
+      --transition: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── 네비게이션 ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 4.25rem;
+      background: rgba(232, 230, 220, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(20, 20, 19, 0.1);
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+    }
+    .nav-inner {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--ink-mid);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-btn {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--ink) !important;
+      border: 1px solid rgba(20, 20, 19, 0.35) !important;
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius);
+      transition: background var(--transition), border-color var(--transition) !important;
+    }
+    .nav-btn:hover {
+      background: rgba(20, 20, 19, 0.06) !important;
+      border-color: var(--ink) !important;
+    }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 1.5px;
+      background: var(--ink);
+      border-radius: 1px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ── 히어로 ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: calc(4.25rem + 6rem) clamp(1.5rem, 5vw, 4rem) 6rem;
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .hero-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px; height: 1px;
+      background: var(--rust);
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 4.5vw, 3.75rem);
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 1.75rem;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--rust);
+    }
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--ink-soft);
+      max-width: 440px;
+      line-height: 1.85;
+      margin-bottom: 2.5rem;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-fill {
+      background: var(--ink);
+      color: var(--cream);
+      font-family: var(--sans);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.7rem 1.4rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      transition: opacity var(--transition);
+    }
+    .btn-fill:hover { opacity: 0.82; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.7rem 1.4rem;
+      border-radius: var(--radius);
+      border: 1px solid rgba(20, 20, 19, 0.35);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .btn-ghost:hover {
+      border-color: var(--ink);
+      background: rgba(20, 20, 19, 0.04);
+    }
+
+    /* 히어로 오른쪽 — 수치 패널 */
+    .hero-panel {
+      background: var(--cream-light);
+      border: 1px solid var(--ink-faint);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--ink-faint);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .panel-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .panel-stat {
+      padding: 2rem;
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .panel-stat:nth-child(odd) { border-right: 1px solid var(--ink-faint); }
+    .panel-stat:nth-last-child(-n+2) { border-bottom: none; }
+    .stat-num {
+      font-family: var(--serif);
+      font-size: 2.4rem;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── 서비스 ── */
+    .services {
+      padding: 7rem clamp(1.5rem, 5vw, 4rem);
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .section-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .section-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: end;
+      margin-bottom: 4rem;
+    }
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 1rem;
+    }
+    .section-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px; height: 1px;
+      background: var(--rust);
+    }
+    .section-header h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 3vw, 2.75rem);
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .section-header p {
+      font-size: 0.9375rem;
+      color: var(--ink-soft);
+      line-height: 1.85;
+      align-self: end;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--ink-faint);
+      border-left: 1px solid var(--ink-faint);
+    }
+    .service-card {
+      padding: 2.25rem;
+      border-bottom: 1px solid var(--ink-faint);
+      border-right: 1px solid var(--ink-faint);
+      transition: background var(--transition);
+    }
+    .service-card:hover { background: var(--cream-light); }
+    .service-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+    .service-card h3 {
+      font-family: var(--serif);
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.01em;
+    }
+    .service-card p {
+      font-size: 0.875rem;
+      color: var(--ink-soft);
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+    }
+    .service-link {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: gap var(--transition);
+    }
+    .service-link::after { content: '→'; }
+    .service-card:hover .service-link { gap: 0.65rem; }
+
+    /* ── CTA ── */
+    .cta {
+      padding: 7rem clamp(1.5rem, 5vw, 4rem);
+      background: var(--ink);
+    }
+    .cta-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3rem;
+      align-items: center;
+    }
+    .cta-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 1rem;
+    }
+    .cta-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px; height: 1px;
+      background: var(--rust);
+    }
+    .cta h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 500;
+      color: var(--cream);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .cta h2 em {
+      font-style: italic;
+      color: var(--rust);
+    }
+    .btn-cream {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.8rem 1.6rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+      transition: opacity var(--transition);
+    }
+    .btn-cream:hover { opacity: 0.88; }
+
+    /* ── 푸터 ── */
+    footer {
+      padding: 2.5rem clamp(1.5rem, 5vw, 4rem);
+      border-top: 1px solid rgba(232, 230, 220, 0.15);
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .footer-logo {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--cream-light);
+      text-decoration: none;
+    }
+    .footer-meta {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+    }
+
+    /* ── 반응형 ── */
+    @media (max-width: 960px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .hero-panel { display: none; }
+      .section-header { grid-template-columns: 1fr; gap: 1rem; }
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      .cta-inner { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 4.25rem; left: 0; right: 0;
+        background: var(--cream);
+        border-bottom: 1px solid var(--ink-faint);
+        padding: 1.5rem clamp(1.5rem, 5vw, 4rem) 2rem;
+        gap: 1.25rem;
+      }
+      .hamburger { display: flex; }
+      .services-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 네비게이션 -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="logo">TechCo</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#hero">홈</a></li>
+        <li><a href="#services">서비스</a></li>
+        <li><a href="contact.html" class="nav-btn">문의하기</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="메뉴" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 히어로 -->
+  <section class="hero" id="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow">IT 솔루션 전문 기업</div>
+        <h1>기술이 만드는<br /><em>비즈니스의</em><br />새로운 가능성</h1>
+        <p class="hero-desc">
+          복잡한 기술 문제를 명쾌하게 해결합니다.<br />
+          전략 수립부터 구현, 운영까지 — 처음부터 끝까지 함께합니다.
+        </p>
+        <div class="hero-actions">
+          <a href="#services" class="btn-fill">서비스 살펴보기</a>
+          <a href="contact.html" class="btn-ghost">무료 상담 신청</a>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="panel-header">Our Numbers</div>
+        <div class="panel-stats">
+          <div class="panel-stat">
+            <div class="stat-num">200+</div>
+            <div class="stat-label">완료 프로젝트</div>
+          </div>
+          <div class="panel-stat">
+            <div class="stat-num">10년</div>
+            <div class="stat-label">업계 경력</div>
+          </div>
+          <div class="panel-stat">
+            <div class="stat-num">98%</div>
+            <div class="stat-label">고객 만족도</div>
+          </div>
+          <div class="panel-stat">
+            <div class="stat-num">50+</div>
+            <div class="stat-label">전문 엔지니어</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 서비스 -->
+  <section class="services" id="services">
+    <div class="section-inner">
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">Services</div>
+          <h2>우리가 제공하는<br />핵심 서비스</h2>
+        </div>
+        <p>
+          비즈니스의 성장 단계에 맞는 맞춤형 IT 솔루션을 제공합니다.<br />
+          기술을 통해 더 나은 내일을 함께 만들어갑니다.
+        </p>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card">
+          <span class="service-icon">💻</span>
+          <h3>소프트웨어 개발</h3>
+          <p>기업 맞춤형 웹 · 앱 · 백오피스 시스템을 처음부터 끝까지 개발합니다.</p>
+          <a href="#contact" class="service-link">자세히 알아보기</a>
+        </div>
+        <div class="service-card">
+          <span class="service-icon">☁️</span>
+          <h3>클라우드 인프라</h3>
+          <p>AWS · GCP · Azure 기반의 안정적인 클라우드 환경을 구축하고 운영합니다.</p>
+          <a href="#contact" class="service-link">자세히 알아보기</a>
+        </div>
+        <div class="service-card">
+          <span class="service-icon">🔒</span>
+          <h3>보안 & 컴플라이언스</h3>
+          <p>취약점 진단, 보안 아키텍처 설계, 인증 취득까지 종합 보안을 지원합니다.</p>
+          <a href="#contact" class="service-link">자세히 알아보기</a>
+        </div>
+        <div class="service-card">
+          <span class="service-icon">📊</span>
+          <h3>데이터 분석</h3>
+          <p>흩어진 데이터를 통합하고 인사이트로 전환해 의사결정을 지원합니다.</p>
+          <a href="#contact" class="service-link">자세히 알아보기</a>
+        </div>
+        <div class="service-card">
+          <span class="service-icon">🤖</span>
+          <h3>AI · 자동화</h3>
+          <p>반복 업무를 자동화하고 AI를 활용해 운영 효율을 극대화합니다.</p>
+          <a href="#contact" class="service-link">자세히 알아보기</a>
+        </div>
+        <div class="service-card">
+          <span class="service-icon">🛠️</span>
+          <h3>IT 컨설팅</h3>
+          <p>현황 진단부터 로드맵 수립까지, 중장기 IT 전략을 함께 설계합니다.</p>
+          <a href="#contact" class="service-link">자세히 알아보기</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="contact">
+    <div class="cta-inner">
+      <div>
+        <div class="cta-eyebrow">Contact</div>
+        <h2>프로젝트를 시작할<br /><em>준비가 되셨나요?</em></h2>
+      </div>
+      <a href="contact.html" class="btn-cream">무료 상담 신청하기 →</a>
+    </div>
+  </section>
+
+  <!-- 푸터 -->
+  <footer>
+    <a href="#" class="footer-logo">TechCo</a>
+    <span class="footer-meta">© 2025 TechCo. All rights reserved.</span>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.getElementById('navLinks');
+      const btn = document.getElementById('hamburger');
+      nav.classList.toggle('open');
+      btn.classList.toggle('open');
+    }
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navLinks').classList.remove('open');
+        document.getElementById('hamburger').classList.remove('open');
+      });
+    });
+  </script>
+
+</body>
+</html>
