@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -549,13 +548,6 @@
   </div>
 
   <script>
-    // ── Supabase 초기화 ──
-    const { createClient } = supabase;
-    const db = createClient(
-      'https://dqkbpdvnxrfsaqjwodyd.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2JwZHZueHJmc2FxandvZHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDU5MTMsImV4cCI6MjA5MTEyMTkxM30.hqyw0J0TdFjUWwOMM9JbQAWUiNqI-IxjckclAft34ws'
-    );
-
     const form = document.getElementById('contactForm');
     const formPanel = document.getElementById('formPanel');
     const successScreen = document.getElementById('successScreen');
@@ -601,19 +593,24 @@
       submitBtn.disabled = true;
       submitBtn.textContent = '처리 중...';
 
-      // ── Supabase 저장 ──
-      const { error } = await db.from('contacts').insert({
-        name,
-        company: form.company.value.trim() || null,
-        email,
-        phone,
-        services: services.map(el => el.value).join(', '),
-        budget: form.budget.value || null,
-        message,
+      // ── 서버리스 함수로 전송 ──
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          company: form.company.value.trim() || null,
+          email,
+          phone,
+          services: services.map(el => el.value).join(', '),
+          budget: form.budget.value || null,
+          message,
+        }),
       });
 
-      if (error) {
-        alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.\n' + error.message);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.\n' + (data.error || ''));
         submitBtn.disabled = false;
         submitBtn.textContent = '상담 신청하기';
         return;
